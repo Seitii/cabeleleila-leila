@@ -7,25 +7,24 @@ import java.time.LocalDateTime;
 
 @Entity
 @Data
+@Table(schema = "agenda", name = "agendamento")
 public class Agendamento {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cliente_id", referencedColumnName = "id")
-    private Usuario usuario;
+    @Column(name = "cliente_id", nullable = false)
+    private Integer clienteId;
 
-    @Column(name = "descricao")
+    @Column(name = "nome_usuario", nullable = false, length = 255)
+    private String nomeUsuario;
+
+    @Column(name = "descricao", nullable = false, length = 255)
     private String descricao;
 
-    @Column(name = "data_agendamento")
+    @Column(name = "data_agendamento", columnDefinition = "TIMESTAMP WITH TIME ZONE")
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime dataAgendamento;
 
-    @PrePersist
-    public void prePersist() {
-        this.dataAgendamento = LocalDateTime.now();
-    }
 }

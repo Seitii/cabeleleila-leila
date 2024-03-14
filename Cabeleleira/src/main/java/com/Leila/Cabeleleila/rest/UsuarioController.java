@@ -11,20 +11,20 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 
-@RestController // tudo que retonar no metodo, é o corpo da resposta.
-@RequestMapping("/api/teste")  // Mapea a url basica
+@RestController
+@RequestMapping("/api/clientes")
 public class UsuarioController {
 
     private final UsuarioRepository repository;
 
-    @Autowired // dependencia obrigatoria. pois é construtor
+    @Autowired
     public UsuarioController(UsuarioRepository repository) {
         this.repository = repository;
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED) // retorna o status no servidor CREATION
-    public Usuario save(@RequestBody @Valid Usuario usuario) { // valida a requisição
+    public Usuario salvar(@RequestBody @Valid Usuario usuario) { // valida a requisição
         return repository.save(usuario);
     }
 
@@ -36,7 +36,7 @@ public class UsuarioController {
     // deleta um usuario
     @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deletar(@PathVariable Integer id) {
+    public void delete(@PathVariable Integer id) {
 //        repository.deleteById(id);   // DELETA POR ID de forma rapida
         repository.findById(id).map(
                 usuario -> {
@@ -52,8 +52,8 @@ public class UsuarioController {
         repository.findById(id).map(
                 usuario -> {
                     usuario.setNome(usuarioAtualizado.getNome());
-                    usuario.setDescricao(usuarioAtualizado.getDescricao());
                     usuario.setEmail(usuarioAtualizado.getEmail());
+                    usuario.setSenha(usuarioAtualizado.getSenha());
                     return repository.save(usuario);
                 }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario não encontrado"));
     }

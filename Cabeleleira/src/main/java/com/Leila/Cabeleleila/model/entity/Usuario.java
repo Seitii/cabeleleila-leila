@@ -28,22 +28,7 @@ public class Usuario {
     private String email;
 
     @Column(name = "senha")
-    @NotEmpty(message = "{campo.senha.obrigatorio}")
+    @NotEmpty
     private String senha;
 
-    @Column(name = "telefone")
-    @NotEmpty(message = "{campo.telefone.obrigatorio}")
-    private String telefone;
-
-    @Column(name = "data_cadastro")
-    @JsonFormat(pattern = "dd/MM/yyyy")
-    private LocalDate dataCadastro; // Ajuste no nome da variável para seguir a convenção Java
-
-    @Column(name = "descricao", nullable = false)
-    @NotEmpty(message = "{campo.descricao.obrigatorio}")
-    private String descricao;
-
-    @Column(name = "sexo", nullable = false)
-    @NotEmpty(message = "{campo.sexo.obrigatorio}")
-    private String sexo;
 }

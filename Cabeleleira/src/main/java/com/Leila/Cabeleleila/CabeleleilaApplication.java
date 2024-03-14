@@ -9,21 +9,18 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @SpringBootApplication
-public class CabeleleilaApplication {
+public class CabeleleilaApplication{
 
     @Bean
     public CommandLineRunner run(@Autowired UsuarioRepository usuarioRepository) {
         return args -> {
             Usuario usuario = new Usuario();
             usuario.setNome("Hugo");
-            usuario.setEmail("usuario@gmail.com"); // Exemplo de e-mail preenchido
+            usuario.setEmail("email@teste11.com"); // Exemplo de e-mail preenchido
             usuario.setSenha("1234567");
-            usuario.setTelefone("61986389157");
-            usuario.setDescricao("Cortar cabelo");
-            usuario.setDataCadastro(LocalDate.now()); // Ajuste para camelCase
-            usuario.setSexo("M"); // ou "F", ou outro valor apropriado
             usuarioRepository.save(usuario); // Salvando o usuário no banco de dados
         };
     }
