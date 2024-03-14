@@ -18,7 +18,6 @@ public class CabeleleilaApplication{
     public CommandLineRunner run(@Autowired UsuarioRepository usuarioRepository) {
         return args -> {
             Usuario usuario = new Usuario();
-            usuario.setNome("Hugo");
             usuario.setEmail("email@teste11.com"); // Exemplo de e-mail preenchido
             usuario.setSenha("1234567");
             usuarioRepository.save(usuario); // Salvando o usuário no banco de dados

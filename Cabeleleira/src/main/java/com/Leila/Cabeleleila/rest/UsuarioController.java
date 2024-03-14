@@ -28,17 +28,17 @@ public class UsuarioController {
         return repository.save(usuario);
     }
 
-    @GetMapping("{id}") // procura por map, recebe no post. é flexivel.
-    public Usuario acharPorId(@PathVariable Integer id) {
-        return repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario não encontrado")); // procura o id pelo id, se caso nao achar faz outra coisa.
+    @GetMapping("{id_usuario}") // procura por map, recebe no post. é flexivel.
+    public Usuario acharPorId(@PathVariable Integer id_usuario) {
+        return repository.findById(id_usuario).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario não encontrado")); // procura o id pelo id, se caso nao achar faz outra coisa.
     }
 
     // deleta um usuario
-    @DeleteMapping("{id}")
+    @DeleteMapping("{id_usuario}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Integer id) {
+    public void delete(@PathVariable Integer id_usuario) {
 //        repository.deleteById(id);   // DELETA POR ID de forma rapida
-        repository.findById(id).map(
+        repository.findById(id_usuario).map(
                 usuario -> {
                     repository.delete(usuario);
                     return Void.TYPE;
@@ -48,10 +48,9 @@ public class UsuarioController {
     // Atualização do usuario
     @PutMapping("{id}") // Atualiza o recurso
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void atualizar(@PathVariable Integer id, @RequestBody @Valid Usuario usuarioAtualizado) {
-        repository.findById(id).map(
+    public void atualizar(@PathVariable Integer id_usuario, @RequestBody @Valid Usuario usuarioAtualizado) {
+        repository.findById(id_usuario).map(
                 usuario -> {
-                    usuario.setNome(usuarioAtualizado.getNome());
                     usuario.setEmail(usuarioAtualizado.getEmail());
                     usuario.setSenha(usuarioAtualizado.getSenha());
                     return repository.save(usuario);

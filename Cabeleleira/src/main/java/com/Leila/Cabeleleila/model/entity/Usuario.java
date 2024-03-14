@@ -17,11 +17,7 @@ public class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-
-    @Column(name = "nome")
-    @NotEmpty(message = "{campo.nome.obrigatorio}")
-    private String nome;
+    private Integer id_usuario;
 
     @Column(name = "email")
     @NotEmpty(message = "{campo.email.obrigatorio}")
