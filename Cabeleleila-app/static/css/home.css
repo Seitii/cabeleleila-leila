@@ -17,6 +17,11 @@ html {
     outline: none;
 }
 
+h2 {
+    padding-top: 0px;
+    margin-top: 0px;
+}
+
 .nav-bar-container {
     display: flex;
     justify-content: center;
@@ -36,10 +41,21 @@ html {
 
 .titulo-agendamento {
     text-align: center;
+    padding-left: 200px;
     flex-grow: 1;
 }
 
+.info-agendamento {
+    padding-bottom: 5px;
+}
+
+.usuario {
+    padding-right: 25px;
+    font-weight: bold;
+}
+
 .saida {
+    align-items: center;
     padding-right: 80px;
     display: flex;
     justify-content: flex-end;
@@ -227,7 +243,7 @@ button {
     background-color: #f0f0f0;
     border-radius: 45px;
     width: 60%;
-    height: 20vh;
+    height: auto;
     padding-left: 50px;
     padding-top: 5px;
     margin: auto;
@@ -249,6 +265,18 @@ button {
     padding-bottom: 15px;
 }
 
+.editar {
+    text-align: right;
+    justify-content: right;
+    padding-right: 50px;
+    font-size: 25px;
+    padding-top: 5px;
+}
+
+#editar {
+    color: #000;
+}
+
 .btn-adicionar {
     border-radius: 25px;
     background-color: #ffd900;
@@ -264,13 +292,15 @@ button {
     color: #f0f0f0;
 }
 
-@media (max-width: 768px) {
-    .date-group {
-        flex-direction: column;
+@media (max-width: 1050px) {
+    .lista-agendamentos {
+        height: 30vh;
     }
-
-    .date-group input[type="date"] {
-        width: 100%;
+    .lista-agendamentos {
+        width: 80%;
+        height: auto;
+        padding: 20px;
+        flex-direction: column;
     }
 }
 
@@ -294,5 +324,64 @@ button {
     .blue-div {
         height: auto;
         border-radius: 0;
+    }
+
+    .lista-agendamentos {
+        width: 80%;
+        height: auto;
+        padding: 20px;
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 600px) {
+    .usuario {
+        display: none;
+    }
+
+    .titulo-agendamento {
+        padding-left: 100px;
+    }
+
+    .lista-agendamentos {
+        width: 80%;
+        height: auto;
+        padding: 20px;
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 400px) {
+    .titulo-agendamento {
+        padding-left: 5px;
+    }
+
+    .saida {
+        display: none;
+    }
+    
+    .adicionar {
+        padding-right: 25px;
+        padding-bottom: 10px;
+    }
+
+    .lista-agendamentos {
+        width: 80%;
+        height: auto;
+        padding: 20px;
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 350px) {
+    .lista-agendamentos {
+        height: 40vh;
+    }       
+
+    .lista-agendamentos {
+        width: 80%;
+        height: auto;
+        padding: 20px;
+        flex-direction: column;
     }
 }

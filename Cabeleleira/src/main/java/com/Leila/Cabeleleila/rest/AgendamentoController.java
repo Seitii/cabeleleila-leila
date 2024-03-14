@@ -14,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -41,5 +42,13 @@ public class AgendamentoController {
         agendamento.setData_agendamento(data);
         agendamento.setUsuario(usuario);
         return repository.save(agendamento);
+    }
+    @GetMapping
+    public List<Agendamento> pesquisar(
+            @RequestParam(value = "nome", required = false) String nome,
+            @RequestParam(value = "mes", required = false) Integer mes
+
+    ){
+        return repository.findByNomeClienteAndMes("%" + nome + "%", mes);
     }
 }
