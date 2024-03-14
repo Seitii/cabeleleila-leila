@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="PT-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/home.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz@6..12&display=swap" rel="stylesheet">
+    <title>Document</title>
+</head>
+
+<nav class="nav-bar-container">
+    <div class="nav-bar">
+        <div class="titulo-agendamento">
+            <h1 class="titulo">Agendamentos</h1>
+        </div>
+        <div class="saida">
+            <a href="/templates/index.html">
+                <i id="saida" class="fa fa-sign-out" aria-hidden="true"></i>
+            </a>
+        </div>
+    </div>
+</nav>
+<div class="container">
+</div>
+
+<div class="footer-adicionar">
+    <div class="adicionar">  
+        <div class="btn-adicionar">
+            <a href="#openModal">
+                <i id="plus" class="fa fa-plus" aria-hidden="true"></i>
+            </a>
+        </div> 
+
+        <div id="openModal" class="modalDialog">
+          <div>
+            <a href="#close" title="Close" class="close">X</a>
+            <div class="relatorio-container">
+                <div class="left">
+                    <form action="#" method="post" class="form-container">
+                        <div class="form-group">
+                            <input class="input-pop" placeholder="Nome" id="nome" name="nome" required>
+                        </div>
+                        <div class="form-group">
+                            <input placeholder="Telefone" class="input-pop" id="telefone" name="telefone" required>
+                        </div>
+                        <div class="form-group">
+                            <input class="input-pop" placeholder="Serviço" id="servico" name="servico" required>
+                        </div>
+                        <div class="form-group date-group">
+                            <input type="date" id="data" required>
+                        </div>
+                        <div class="form-group date-group">
+                            <input class="input-pop" type="time" id="horario" required>
+                        </div>
+                        <div class="form-group">
+                            <button class="confirmar-adicionar" type="button" onclick="validarFormulario()">Adicionar</button>
+                        </div>
+                    </form>
+                </div>
+          </div>
+        </div>
+    </div>
+</div>
+</html>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("plus").addEventListener("click", function() {
+            var modal = document.querySelector(".modalDialog");
+            if (modal) {
+                modal.style.display = "block";
+            }
+        });
+    });
+
+    function validarFormulario() {
+        var nome = document.getElementById("nome").value;
+        var telefone = document.getElementById("telefone").value;
+        var data = document.getElementById("data").value;
+        var horario = document.getElementById("horario").value;
+
+        if (nome === "" || telefone === "" || data === "" || horario === "" || servico === "") {
+            alert("Por favor, preencha todos os campos.");
+        } else {
+            alert("Seu serviço foi Agendado!");
+            var modal = document.querySelector(".modalDialog");
+            if (modal) {
+                modal.style.display = "none";
+            }
+            adicionarAgendamento();
+        }
+    }
+
+    function adicionarAgendamento() {
+        var nome = document.getElementById("nome").value;
+        var telefone = document.getElementById("telefone").value;
+        var servico = document.getElementById("servico").value;
+        var data = document.getElementById("data").value;
+        var horario = document.getElementById("horario").value;
+
+        // Cria os elementos
+        var divListaAgendamentos = document.createElement("div");
+        var divInfoAgendamento = document.createElement("div");
+        var h2 = document.createElement("h2");
+        var pTelefone = document.createElement("p");
+        var pServico = document.createElement("p");
+        var pDataHorario = document.createElement("p");
+
+        // Adiciona as classes
+        divListaAgendamentos.className = "lista-agendamentos";
+        divInfoAgendamento.className = "info-agendamento";
+
+        // Define o conteúdo
+        h2.textContent = nome;
+        pTelefone.textContent = "Telefone: " + telefone;
+        pServico.textContent = "Serviço: " + servico;
+        pDataHorario.textContent = "Data: " + data + " Horário: " + horario;
+
+        // Monta a estrutura
+        divInfoAgendamento.appendChild(h2);
+        divInfoAgendamento.appendChild(pTelefone);
+        divInfoAgendamento.appendChild(pServico);
+        divInfoAgendamento.appendChild(pDataHorario);
+        divListaAgendamentos.appendChild(divInfoAgendamento);
+
+        // Adiciona ao container
+        document.querySelector(".container").appendChild(divListaAgendamentos);
+
+        // Limpa os inputs após adicionar
+        document.getElementById("nome").value = "";
+        document.getElementById("telefone").value = "";
+        document.getElementById("servico").value = "";
+        document.getElementById("data").value = "";
+        document.getElementById("horario").value = "";
+    }
+</script>
