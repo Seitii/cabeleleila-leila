@@ -9,7 +9,6 @@ import java.util.List;
 
 public interface AgendamentoRepository extends JpaRepository<Agendamento, Integer> {
 
-    @Query("select s from Agendamento s join s.usuario u " +
-            "where upper(u.nome) like upper(:nome) and MONTH(s.data_agendamento) =:mes")
+    @Query(value = "SELECT s FROM Agendamento s JOIN s.usuario u WHERE UPPER(u.nome) LIKE UPPER(:nome) AND EXTRACT(MONTH FROM s.data_agendamento) = :mes", nativeQuery = true)
     List<Agendamento> findByNomeClienteAndMes(@Param("nome") String nome, @Param("mes") Integer mes);
 }
