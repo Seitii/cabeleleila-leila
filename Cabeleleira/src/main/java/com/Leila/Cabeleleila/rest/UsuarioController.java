@@ -1,7 +1,5 @@
 package com.Leila.Cabeleleila.rest;
 
-// api de usuarios
-
 import com.Leila.Cabeleleila.model.entity.Usuario;
 import com.Leila.Cabeleleila.model.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +10,7 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/api/clientes")
+@RequestMapping("/api/usuarios") // A URL base para essa classe controladora é /api/clientes
 public class UsuarioController {
 
     private final UsuarioRepository repository;
@@ -23,38 +21,31 @@ public class UsuarioController {
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED) // retorna o status no servidor CREATION
-    public Usuario salvar(@RequestBody @Valid Usuario usuario) { // valida a requisição
+    @ResponseStatus(HttpStatus.CREATED)
+    public Usuario salvar(@RequestBody @Valid Usuario usuario) {
         return repository.save(usuario);
     }
 
-    @GetMapping("{id_usuario}") // procura por map, recebe no post. é flexivel.
+    @GetMapping("{id_usuario}")
     public Usuario acharPorId(@PathVariable Integer id_usuario) {
-        return repository.findById(id_usuario).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario não encontrado")); // procura o id pelo id, se caso nao achar faz outra coisa.
+        return repository.findById(id_usuario)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
     }
 
-    // deleta um usuario
     @DeleteMapping("{id_usuario}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Integer id_usuario) {
-//        repository.deleteById(id);   // DELETA POR ID de forma rapida
-        repository.findById(id_usuario).map(
-                usuario -> {
-                    repository.delete(usuario);
-                    return Void.TYPE;
-                }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario não encontrado"));
+        repository.findById(id_usuario).ifPresent(repository::delete);
     }
 
-    // Atualização do usuario
-    @PutMapping("{id}") // Atualiza o recurso
+    @PutMapping("{id_usuario}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void atualizar(@PathVariable Integer id_usuario, @RequestBody @Valid Usuario usuarioAtualizado) {
-        repository.findById(id_usuario).map(
-                usuario -> {
+        repository.findById(id_usuario)
+                .map(usuario -> {
                     usuario.setEmail(usuarioAtualizado.getEmail());
                     usuario.setSenha(usuarioAtualizado.getSenha());
                     return repository.save(usuario);
-                }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario não encontrado"));
+                }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
     }
 }
-
