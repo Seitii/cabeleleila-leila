@@ -44,6 +44,7 @@ public class UsuarioController {
         repository.findById(id_usuario)
                 .map(usuario -> {
                     usuario.setEmail(usuarioAtualizado.getEmail());
+                    usuario.setNome(usuarioAtualizado.getNome());
                     usuario.setSenha(usuarioAtualizado.getSenha());
                     return repository.save(usuario);
                 }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));

@@ -20,6 +20,7 @@ public class CabeleleilaApplication{
             Usuario usuario = new Usuario();
             usuario.setEmail("email@teste11.com"); // Exemplo de e-mail preenchido
             usuario.setSenha("1234567");
+            usuario.setNome("teste");
             usuarioRepository.save(usuario); // Salvando o usuário no banco de dados
         };
     }

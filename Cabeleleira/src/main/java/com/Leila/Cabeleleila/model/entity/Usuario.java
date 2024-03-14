@@ -27,4 +27,8 @@ public class Usuario {
     @NotEmpty
     private String senha;
 
+    @Column(name = "nome_usuario")
+    @NotEmpty
+    private String nome;
+
 }
