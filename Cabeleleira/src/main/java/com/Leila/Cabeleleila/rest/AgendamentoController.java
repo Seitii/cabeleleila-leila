@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,41 +22,42 @@ import java.util.stream.Collectors;
 public class AgendamentoController {
 
     private final UsuarioRepository usuarioRepository;
-    private final AgendamentoRepository repository;
+    private final AgendamentoRepository agendamentoRepository;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Agendamento salvar(@RequestBody AgendamentoDTO dto) {
-        String dataAgendamento = dto.getData_agendamento();
-        Integer clienteId = dto.getCliente_id();
-
-        Usuario usuario = usuarioRepository.findById(clienteId)
-                .orElseThrow(() ->
-                        new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuario não existe"));
+    public AgendamentoDTO salvar(@RequestBody AgendamentoDTO dto) {
+        Usuario usuario = usuarioRepository.findById(dto.getCliente_id())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuario não existe"));
 
         Agendamento agendamento = new Agendamento();
         agendamento.setDescricao(dto.getDescricao());
-        agendamento.setData_agendamento(dataAgendamento);
+        agendamento.setData_agendamento(dto.getData_agendamento()); // Garanta que isso esteja no formato correto
         agendamento.setUsuario(usuario);
 
-        return repository.save(agendamento);
+        Agendamento novoAgendamento = agendamentoRepository.save(agendamento);
+
+        dto.setNomeUsuario(usuario.getNome()); // Inclui o nome do usuário no DTO
+        return dto; // Retorna o DTO incluindo o nome do usuário
     }
+
     @GetMapping
-    public List<Agendamento> pesquisar(@RequestParam(value = "nome", required = false, defaultValue = "") String nome,
-                                       @RequestParam(value = "mes", required = false) Integer mes) {
-        List<Agendamento> resultados = repository.findByNome("%" + nome + "%");
+    public List<AgendamentoDTO> pesquisar(@RequestParam(value = "nome", required = false, defaultValue = "") String nome,
+                                          @RequestParam(value = "mes", required = false) Integer mes) {
+        List<Agendamento> agendamentos = agendamentoRepository.findAll(); // Pode precisar ajustar para sua lógica específica
 
-        if (mes != null) {
-            return resultados.stream()
-                    .filter(a -> {
-                        String[] parts = a.getData_agendamento().split("-");
-                        int mesAgendamento = Integer.parseInt(parts[1]);
-                        return mesAgendamento == mes;
-                    })
-                    .collect(Collectors.toList());
-        } else {
-            return resultados;
-        }
+        // Filtro adicional em Java para exemplo; idealmente, faça isso via consulta SQL/JPA se possível
+        return agendamentos.stream()
+                .filter(agendamento -> agendamento.getUsuario().getNome().toLowerCase().contains(nome.toLowerCase()))
+                .filter(agendamento -> mes == null || LocalDateTime.parse(agendamento.getData_agendamento(), DateTimeFormatter.ISO_LOCAL_DATE_TIME).getMonthValue() == mes)
+                .map(agendamento -> {
+                    AgendamentoDTO dto = new AgendamentoDTO();
+                    dto.setCliente_id(agendamento.getUsuario().getId_usuario());
+                    dto.setDescricao(agendamento.getDescricao());
+                    dto.setData_agendamento(agendamento.getData_agendamento());
+                    dto.setNomeUsuario(agendamento.getUsuario().getNome()); // Assume que o `Usuario` tem um método `getNome()`
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
-
 }
