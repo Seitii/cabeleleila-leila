@@ -12,18 +12,24 @@
 <nav class="nav-bar-container">
     <div class="nav-bar">
         <div class="titulo-agendamento">
-            <h1 class="titulo">Agendamentos</h1>
+            <h1 class="titulo">Agendamentos Leila</h1>
         </div>
         <div class="saida">
-            <p class="usuario">Hugo Seiti</p>
-            <a href="/templates/index.html">
+            <p class="usuario"></p>
+            <a href="/templates/login.html">
                 <i id="saida" class="fa fa-sign-out" aria-hidden="true"></i>
             </a>
         </div>
     </div>
 </nav>
 <div class="container">
-    <!-- Este container pode ser preenchido com conteúdo dinâmico -->
+    <div class="lista-agendamentos">
+        <div class="info-agendamento">
+            <h2></h2>
+            <p></p>
+            <p></p>
+        </div>
+    </div>
 </div>
 <div class="footer-adicionar">
     <div class="adicionar">  
@@ -62,14 +68,27 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
+
 document.addEventListener("DOMContentLoaded", function() {
+    preencherNomeUsuario();
     document.getElementById("plus").addEventListener("click", function() {
         var modal = document.querySelector(".modalDialog");
         if (modal) {
             modal.style.display = "block";
+            preencherNomeUsuario(); 
         }
     });
 });
+
+function preencherNomeUsuario() {
+    var nomeUsuario = localStorage.getItem('usuarioNome'); 
+    if (nomeUsuario) {
+        var campoNome = document.getElementById("nome"); 
+        campoNome.value = nomeUsuario;
+        campoNome.readOnly = true;
+        document.querySelector('.usuario').textContent = nomeUsuario;
+    }
+}
 
 function validarFormulario() {
     var nome = document.getElementById("nome").value;
@@ -90,29 +109,84 @@ function validarFormulario() {
 }
 
 function adicionarAgendamento() {
-    var nome = document.getElementById("nome").value;
     var servico = document.getElementById("servico").value;
     var data = document.getElementById("data").value;
     var horario = document.getElementById("horario").value;
+    var nomeUsuario = localStorage.getItem('usuarioNome');
 
-    var dataHoraFormatada = `${data}T${horario}`;
+    var dataHoraFormatada = `${data}T${horario}:00`;
 
     var agendamentoDTO = {
-        cliente_id: 1, 
+        cliente_id: localStorage.getItem('usuarioId'), 
         descricao: servico,
-        data_agendamento: dataHoraFormatada
+        data_agendamento: dataHoraFormatada,
+        nomeUsuario: nomeUsuario
     };
+    
 
-    axios.post('/api/agendamento', agendamentoDTO)
+    axios.post('http://localhost:8080/api/agendamento', agendamentoDTO)
         .then(function(response) {
             console.log(response);
             alert("Agendamento adicionado com sucesso!");
+            buscarAgendamentos();
         })
         .catch(function(error) {
             console.error(error);
             alert("Erro ao adicionar o agendamento.");
         });
+
+    
 }
+
+function buscarAgendamentos() {
+    axios.get('http://localhost:8080/api/agendamento')
+        .then(function(response) {
+            exibirAgendamentos(response.data);
+        })
+        .catch(function(error) {
+            console.error("Erro ao buscar agendamentos:", error);
+        });
+}
+
+function exibirAgendamentos(agendamentos) {
+    const container = document.querySelector('.container');
+    container.innerHTML = '';
+
+    agendamentos.forEach(agendamento => {
+        const listaAgendamentos = document.createElement('div');
+        listaAgendamentos.classList.add('lista-agendamentos');
+
+        const infoAgendamento = document.createElement('div');
+        infoAgendamento.classList.add('info-agendamento');
+
+        const nome = document.createElement('h2');
+        nome.textContent = agendamento.nomeUsuario || 'Nome não disponível';
+
+        const servico = document.createElement('p');
+        servico.textContent = `Serviço: ${agendamento.descricao}`;
+
+        const data = new Date(agendamento.data_agendamento);
+        const dataFormatada = data.toLocaleString('pt-BR', {
+            dateStyle: 'short',
+            timeStyle: 'short'
+        });
+        
+        const dataAgendamento = document.createElement('p');
+        dataAgendamento.textContent = `Data: ${dataFormatada}`;
+
+        infoAgendamento.appendChild(nome);
+        infoAgendamento.appendChild(servico);
+        infoAgendamento.appendChild(dataAgendamento);
+
+        listaAgendamentos.appendChild(infoAgendamento);
+
+        container.appendChild(listaAgendamentos);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', buscarAgendamentos);
+
+
 </script>
 </body>
 </html>

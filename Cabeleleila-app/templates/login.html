@@ -39,29 +39,28 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const loginForm = document.getElementById('loginForm');
+loginForm.addEventListener('submit', function (e) {
+    e.preventDefault(); 
 
-    loginForm.addEventListener('submit', function (e) {
-        e.preventDefault(); 
+    const email = document.querySelector('.email').value;
+    const senha = document.querySelector('.password').value;
 
-        const email = document.querySelector('.input-box .email').value;
-        const senha = document.querySelector('.input-box .password').value;
-
-        axios.post('http://localhost:8080/api/login', {
-            email: email,
-            senha: senha
-        })
-        .then(function (response) {
-            console.log(response);
-            window.location.href = '/templates/home.html'; 
-        })
-        .catch(function (error) {
-            console.error(error);
-            alert('Falha no login. Verifique seu email e senha.');
-        });
+    axios.post('http://localhost:8080/api/login', {
+        email: email,
+        senha: senha
+    })
+    .then(function (response) {
+        console.log(response);
+        localStorage.setItem('usuarioNome', response.data.nome);
+        localStorage.setItem('usuarioId', response.data.id_usuario);
+        window.location.href = '/templates/home.html'; 
+    })
+    .catch(function (error) {
+        console.error(error);
+        alert('Falha no login. Verifique seu email e senha.');
     });
 });
+
 
 function togglePassword() {
     const passwordInput = document.querySelector('.input-box .password');
