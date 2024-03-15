@@ -12,4 +12,5 @@ public class AgendamentoDTO {
 
     private String data_agendamento;
 
+    private String nomeUsuario;
 }
