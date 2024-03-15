@@ -19,20 +19,20 @@ public class ApplicationControllerAdvice {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST) // aponta os erros para o usuario
     public ApiErrors handleValidationErrors(MethodArgumentNotValidException ex){
-        BindingResult bindingResult = ex.getBindingResult(); // resultado da validação
+        BindingResult bindingResult = ex.getBindingResult();
         List<String> messages = bindingResult.getAllErrors()
                 .stream()
                 .map(objectError -> objectError.getDefaultMessage())
-                .collect(Collectors.toList()); // faz um array de strings
-        return  new ApiErrors(messages); // Intercepta e pega as mensagem de erros e retorna em um objeto personalizado
+                .collect(Collectors.toList());
+        return  new ApiErrors(messages);
     }
 
     @ExceptionHandler(ResponseStatusException.class
     )
     public ResponseEntity<ApiErrors> handleResponseStatusException(ResponseStatusException ex){
-        String mensagemError = ex.getReason(); // Preferencialmente use getReason() ao invés de getMessage()
+        String mensagemError = ex.getReason();
         HttpStatus codigoStatus = ex.getStatus();
         ApiErrors apiErrors = new ApiErrors(mensagemError);
         return new ResponseEntity<>(apiErrors, codigoStatus);
-    }// Retorno dinamico
+    }
 }

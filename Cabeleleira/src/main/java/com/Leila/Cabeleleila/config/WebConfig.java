@@ -16,10 +16,10 @@ public class WebConfig {
     @Bean
     public FilterRegistrationBean<CorsFilter> corsFilterFilterRegistrationBean() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.setAllowedOrigins(Arrays.asList("*")); // Permitir todos os domínios
-        corsConfiguration.setAllowedHeaders(Arrays.asList("*")); // Permitir todos os cabeçalhos
-        corsConfiguration.setAllowedMethods(Arrays.asList("*")); // Permitir todos os métodos
-        corsConfiguration.setAllowCredentials(true); // Permitir credenciais
+        corsConfiguration.setAllowedOrigins(Arrays.asList("*"));
+        corsConfiguration.setAllowedHeaders(Arrays.asList("*"));
+        corsConfiguration.setAllowedMethods(Arrays.asList("*"));
+        corsConfiguration.setAllowCredentials(true); //
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfiguration); // Aplicar as configurações de CORS para todas as rotas

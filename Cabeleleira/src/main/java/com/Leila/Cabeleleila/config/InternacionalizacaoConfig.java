@@ -31,8 +31,4 @@ public class InternacionalizacaoConfig {
         bean.setValidationMessageSource(messageSource());
         return bean;
     }
-
-//    public void addCorsMapings(CorsRegistry registry){
-//        registry.addMapping("/**");
-//    }
-}
+    }

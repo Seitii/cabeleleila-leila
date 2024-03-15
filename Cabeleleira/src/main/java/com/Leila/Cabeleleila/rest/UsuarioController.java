@@ -8,9 +8,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/usuarios") // A URL base para essa classe controladora é /api/clientes
+@RequestMapping("/api/usuarios")
 public class UsuarioController {
 
     private final UsuarioRepository repository;
@@ -50,3 +51,4 @@ public class UsuarioController {
                 }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
     }
 }
+

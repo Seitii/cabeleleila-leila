@@ -17,7 +17,7 @@
                 <h1>Eai Leila!</h1>
                 <h2>Faça login, e agende seu horário.</h2><br>
 
-                <form>
+                <form id="loginForm">
                     <div class="input-box">
                         <i class="fa fa-user"></i><input required class="email" type="text" name="email" placeholder="Email">
                     </div>
@@ -29,28 +29,53 @@
                             <input type="checkbox" name="lembrar_me"><a class="lembrar_me">Lembrar-me</a>
                         </li>
                         <li class="right">
-                            <a class="link" href="/templates/cadastro.html" name="">Não tem login? Cadastre-se!</a>
+                            <a class="link" href="/templates/cadastro.html" name="" >Não tem login? Cadastre-se!</a>
                         </li>
                     </ul>
-                    <a type="submit" class="btn-submit" href="/templates/home.html">Login</a>
+                    <button type="submit" class="btn-submit">Login</button>
                 </form>
             </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+    const loginForm = document.getElementById('loginForm');
+
+    loginForm.addEventListener('submit', function (e) {
+        e.preventDefault(); 
+
+        const email = document.querySelector('.input-box .email').value;
+        const senha = document.querySelector('.input-box .password').value;
+
+        axios.post('http://localhost:8080/api/login', {
+            email: email,
+            senha: senha
+        })
+        .then(function (response) {
+            console.log(response);
+            window.location.href = '/templates/home.html'; 
+        })
+        .catch(function (error) {
+            console.error(error);
+            alert('Falha no login. Verifique seu email e senha.');
+        });
+    });
+});
+
+function togglePassword() {
+    const passwordInput = document.querySelector('.input-box .password');
+    const passwordIcon = document.getElementById('show-password');
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        passwordIcon.classList.remove('fa-eye-slash');
+        passwordIcon.classList.add('fa-eye');
+    } else {
+        passwordInput.type = 'password';
+        passwordIcon.classList.remove('fa-eye');
+        passwordIcon.classList.add('fa-eye-slash');
+    }
+}
+</script>
 </body>
 </html>
-
-<script>
-    function togglePassword() {
-        var passwordInput = document.querySelector('input.password');
-        var showPassElem = document.getElementById('show-password');
-        if (passwordInput.type == 'password') {
-            passwordInput.type = 'text';
-            showPassElem.className = 'fa fa-eye'
-        }
-        else {
-            passwordInput.type = 'password';
-            showPassElem.className = 'fa fa-eye-slash'
-        }
-    }
-</script>

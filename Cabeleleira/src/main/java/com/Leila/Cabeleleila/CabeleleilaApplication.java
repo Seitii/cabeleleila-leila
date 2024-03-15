@@ -18,10 +18,10 @@ public class CabeleleilaApplication{
     public CommandLineRunner run(@Autowired UsuarioRepository usuarioRepository) {
         return args -> {
             Usuario usuario = new Usuario();
-            usuario.setEmail("email@teste11.com"); // Exemplo de e-mail preenchido
-            usuario.setSenha("1234567");
-            usuario.setNome("teste");
-            usuarioRepository.save(usuario); // Salvando o usuário no banco de dados
+            usuario.setEmail("hugoseit@icloud.com");
+            usuario.setSenha("123");
+            usuario.setNome("hugo");
+            usuarioRepository.save(usuario);
         };
     }
 

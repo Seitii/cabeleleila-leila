@@ -15,45 +15,57 @@
             </div>
             <div class="loginform">
                 <h1>Eai Leila!</h1>
-                <h2>Faça login, e agende seu horário.</h2><br>
+                <h2>Faça seu cadastro.</h2><br>
 
-                <form>
+                <form id="cadastroForm">
                     <div class="input-box">
-                        <i class="fa fa-user"></i><input required class="email" type="text" name="email" placeholder="Usuário">
+                        <i class="fa fa-user"></i><input required class="nome" type="text" name="nome" placeholder="Usuário">
                     </div>
                     <div class="input-box">
-                        <i class="fa fa-envelope"></i><input required class="email" type="text" name="email" placeholder="Email">
+                        <i class="fa fa-envelope"></i><input required class="email" type="email" name="email" placeholder="Email">
                     </div>
                     <div class="input-box">
-                        <i class="fa fa-lock"></i><input required class="password" type="password" name="password" placeholder="Password"><i class="fa fa-eye-slash" id="show-password" onclick="togglePassword()"></i>
+                        <i class="fa fa-lock"></i><input required class="password" type="password" name="password" placeholder="Senha"><i class="fa fa-eye-slash" id="show-password" onclick="togglePassword()"></i>
                     </div>
-                    <ul class="options">
-                        <li class="left">
-                            <input type="checkbox" name="lembrar_me"><a class="lembrar_me">Lembrar-me</a>
-                        </li>
-                        <li class="right">
-                            <a class="link" href="/templates/login.html" name="">Já tem login? Entre agora!</a>
-                        </li>
-                    </ul>
-                    <a type="submit" class="btn-submit" href="/templates/home.html">Cadastrar</a>
+                    <button type="submit" class="btn-submit">Cadastrar</button>
                 </form>
+                <ul class="options">
+                    <li class="right">
+                        <a class="link" href="/templates/login.html">Já tem login? Entre agora!</a>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+                document.addEventListener('DOMContentLoaded', function () {
+            const cadastroForm = document.getElementById('cadastroForm');
+
+            cadastroForm.addEventListener('submit', function (e) {
+                e.preventDefault(); 
+
+                const nome = document.querySelector('.input-box .nome').value;
+                const email = document.querySelector('.input-box .email').value;
+                const senha = document.querySelector('.input-box .password').value;
+
+                axios.post('http://localhost:8080/api/usuarios', {
+                    nome: nome,
+                    email: email,
+                    senha: senha
+                })
+                .then(function (response) {
+                    console.log(response);
+                    alert('Cadastro realizado com sucesso!');
+                    window.location.href = '/templates/login.html';
+                })
+                .catch(function (error) {
+                    console.error(error);
+                    alert('Falha no cadastro!');
+                });
+            });
+        });
+    </script>
 </body>
 </html>
-
-<script>
-    function togglePassword() {
-        var passwordInput = document.querySelector('input.password');
-        var showPassElem = document.getElementById('show-password');
-        if (passwordInput.type == 'password') {
-            passwordInput.type = 'text';
-            showPassElem.className = 'fa fa-eye'
-        }
-        else {
-            passwordInput.type = 'password';
-            showPassElem.className = 'fa fa-eye-slash'
-        }
-    }
-</script>
