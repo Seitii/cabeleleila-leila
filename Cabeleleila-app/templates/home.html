@@ -23,12 +23,7 @@
     </div>
 </nav>
 <div class="container">
-    <div class="lista-agendamentos">
-        <div class="info-agendamento">
-            <h2></h2>
-            <p></p>
-            <p></p>
-        </div>
+    <div id="lista-agendamentos" class="lista-agendamentos">
     </div>
 </div>
 <div class="footer-adicionar">
@@ -40,10 +35,10 @@
         </div>
         <div id="openModal" class="modalDialog">
             <div>
-                <a href="#close" title="Close" class="close">X</a>
+                <a href="javascript:void(0)" title="Close" class="close" id="closeModal">X</a>
                 <div class="relatorio-container">
                     <div class="left">
-                        <form class="form-container">
+                        <form id="form-agendamento" class="form-container">
                             <div class="form-group">
                                 <input class="input-pop" placeholder="Nome" id="nome" name="nome" required>
                             </div>
@@ -57,7 +52,7 @@
                                 <input class="input-pop" type="time" id="horario" required>
                             </div>
                             <div class="form-group">
-                                <button class="confirmar-adicionar" type="button" onclick="validarFormulario()">Adicionar</button>
+                                <button class="confirmar-adicionar" type="submit">Adicionar</button>
                             </div>
                         </form>
                     </div>
@@ -66,127 +61,7 @@
         </div>
     </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script>
-
-document.addEventListener("DOMContentLoaded", function() {
-    preencherNomeUsuario();
-    document.getElementById("plus").addEventListener("click", function() {
-        var modal = document.querySelector(".modalDialog");
-        if (modal) {
-            modal.style.display = "block";
-            preencherNomeUsuario(); 
-        }
-    });
-});
-
-function preencherNomeUsuario() {
-    var nomeUsuario = localStorage.getItem('usuarioNome'); 
-    if (nomeUsuario) {
-        var campoNome = document.getElementById("nome"); 
-        campoNome.value = nomeUsuario;
-        campoNome.readOnly = true;
-        document.querySelector('.usuario').textContent = nomeUsuario;
-    }
-}
-
-function validarFormulario() {
-    var nome = document.getElementById("nome").value;
-    var servico = document.getElementById("servico").value;
-    var data = document.getElementById("data").value;
-    var horario = document.getElementById("horario").value;
-
-    if (nome === "" || data === "" || horario === "" || servico === "") {
-        alert("Por favor, preencha todos os campos.");
-    } else {
-        alert("Seu serviço foi Agendado!");
-        var modal = document.querySelector(".modalDialog");
-        if (modal) {
-            modal.style.display = "none";
-        }
-        adicionarAgendamento();
-    }
-}
-
-function adicionarAgendamento() {
-    var servico = document.getElementById("servico").value;
-    var data = document.getElementById("data").value;
-    var horario = document.getElementById("horario").value;
-    var nomeUsuario = localStorage.getItem('usuarioNome');
-
-    var dataHoraFormatada = `${data}T${horario}:00`;
-
-    var agendamentoDTO = {
-        cliente_id: localStorage.getItem('usuarioId'), 
-        descricao: servico,
-        data_agendamento: dataHoraFormatada,
-        nomeUsuario: nomeUsuario
-    };
-    
-
-    axios.post('http://localhost:8080/api/agendamento', agendamentoDTO)
-        .then(function(response) {
-            console.log(response);
-            alert("Agendamento adicionado com sucesso!");
-            buscarAgendamentos();
-        })
-        .catch(function(error) {
-            console.error(error);
-            alert("Erro ao adicionar o agendamento.");
-        });
-
-    
-}
-
-function buscarAgendamentos() {
-    axios.get('http://localhost:8080/api/agendamento')
-        .then(function(response) {
-            exibirAgendamentos(response.data);
-        })
-        .catch(function(error) {
-            console.error("Erro ao buscar agendamentos:", error);
-        });
-}
-
-function exibirAgendamentos(agendamentos) {
-    const container = document.querySelector('.container');
-    container.innerHTML = '';
-
-    agendamentos.forEach(agendamento => {
-        const listaAgendamentos = document.createElement('div');
-        listaAgendamentos.classList.add('lista-agendamentos');
-
-        const infoAgendamento = document.createElement('div');
-        infoAgendamento.classList.add('info-agendamento');
-
-        const nome = document.createElement('h2');
-        nome.textContent = agendamento.nomeUsuario || 'Nome não disponível';
-
-        const servico = document.createElement('p');
-        servico.textContent = `Serviço: ${agendamento.descricao}`;
-
-        const data = new Date(agendamento.data_agendamento);
-        const dataFormatada = data.toLocaleString('pt-BR', {
-            dateStyle: 'short',
-            timeStyle: 'short'
-        });
-        
-        const dataAgendamento = document.createElement('p');
-        dataAgendamento.textContent = `Data: ${dataFormatada}`;
-
-        infoAgendamento.appendChild(nome);
-        infoAgendamento.appendChild(servico);
-        infoAgendamento.appendChild(dataAgendamento);
-
-        listaAgendamentos.appendChild(infoAgendamento);
-
-        container.appendChild(listaAgendamentos);
-    });
-}
-
-document.addEventListener('DOMContentLoaded', buscarAgendamentos);
-
-
-</script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/static/js/home.js"></script>
 </body>
 </html>
