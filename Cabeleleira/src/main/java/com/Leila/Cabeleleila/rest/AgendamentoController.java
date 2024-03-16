@@ -52,8 +52,6 @@ public class AgendamentoController {
                     dto.setId_agendamento(agendamento.getId_agendamento());
                     dto.setCliente_id(agendamento.getUsuario().getId_usuario());
                     dto.setDescricao(agendamento.getDescricao());
-                    dto.setData_agendamento(agendamento.getData_agendamento().toString());
-                    dto.setNomeUsuario(agendamento.getUsuario().getNome());
                     return ResponseEntity.ok(dto);
                 })
                 .orElse(ResponseEntity.notFound().build());
