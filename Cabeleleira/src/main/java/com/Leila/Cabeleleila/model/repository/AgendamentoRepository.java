@@ -10,4 +10,6 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Intege
     // Método para buscar por nome (sem considerar o mês)
     @Query("SELECT a FROM Agendamento a JOIN a.usuario u WHERE UPPER(u.nome) LIKE UPPER(:nome)")
     List<Agendamento> findByNome(@Param("nome") String nome);
+    @Query("SELECT a FROM Agendamento a WHERE a.usuario.id_usuario = :idUsuario")
+    List<Agendamento> findByUsuarioId(Integer idUsuario);
 }

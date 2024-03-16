@@ -7,6 +7,7 @@ import com.Leila.Cabeleleila.model.repository.UsuarioRepository;
 import com.Leila.Cabeleleila.rest.dto.AgendamentoDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -32,32 +33,71 @@ public class AgendamentoController {
 
         Agendamento agendamento = new Agendamento();
         agendamento.setDescricao(dto.getDescricao());
-        agendamento.setData_agendamento(dto.getData_agendamento()); // Garanta que isso esteja no formato correto
+        agendamento.setData_agendamento(dto.getData_agendamento());
         agendamento.setUsuario(usuario);
 
         Agendamento novoAgendamento = agendamentoRepository.save(agendamento);
 
-        dto.setNomeUsuario(usuario.getNome()); // Inclui o nome do usuário no DTO
-        return dto; // Retorna o DTO incluindo o nome do usuário
+        dto.setId_agendamento(novoAgendamento.getId_agendamento());
+        dto.setNomeUsuario(usuario.getNome());
+
+        return dto;
     }
 
-    @GetMapping
-    public List<AgendamentoDTO> pesquisar(@RequestParam(value = "nome", required = false, defaultValue = "") String nome,
-                                          @RequestParam(value = "mes", required = false) Integer mes) {
-        List<Agendamento> agendamentos = agendamentoRepository.findAll(); // Pode precisar ajustar para sua lógica específica
-
-        // Filtro adicional em Java para exemplo; idealmente, faça isso via consulta SQL/JPA se possível
-        return agendamentos.stream()
-                .filter(agendamento -> agendamento.getUsuario().getNome().toLowerCase().contains(nome.toLowerCase()))
-                .filter(agendamento -> mes == null || LocalDateTime.parse(agendamento.getData_agendamento(), DateTimeFormatter.ISO_LOCAL_DATE_TIME).getMonthValue() == mes)
+    @GetMapping("/{id}")
+    public ResponseEntity<AgendamentoDTO> buscarPorId(@PathVariable Integer id) {
+        return agendamentoRepository.findById(id)
                 .map(agendamento -> {
                     AgendamentoDTO dto = new AgendamentoDTO();
+                    dto.setId_agendamento(agendamento.getId_agendamento());
                     dto.setCliente_id(agendamento.getUsuario().getId_usuario());
                     dto.setDescricao(agendamento.getDescricao());
-                    dto.setData_agendamento(agendamento.getData_agendamento());
-                    dto.setNomeUsuario(agendamento.getUsuario().getNome()); // Assume que o `Usuario` tem um método `getNome()`
-                    return dto;
+                    dto.setData_agendamento(agendamento.getData_agendamento().toString());
+                    dto.setNomeUsuario(agendamento.getUsuario().getNome());
+                    return ResponseEntity.ok(dto);
                 })
-                .collect(Collectors.toList());
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+
+    @GetMapping("/todos")
+    public ResponseEntity<List<AgendamentoDTO>> listarTodos() {
+        List<Agendamento> agendamentos = agendamentoRepository.findAll();
+
+        if(agendamentos.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        List<AgendamentoDTO> agendamentoDTOS = agendamentos.stream().map(agendamento -> {
+            AgendamentoDTO dto = new AgendamentoDTO();
+            dto.setId_agendamento(agendamento.getId_agendamento());
+            dto.setCliente_id(agendamento.getUsuario().getId_usuario());
+            dto.setDescricao(agendamento.getDescricao());
+            dto.setData_agendamento(agendamento.getData_agendamento());
+            dto.setNomeUsuario(agendamento.getUsuario().getNome());
+            return dto;
+        }).collect(Collectors.toList());
+
+        return ResponseEntity.ok(agendamentoDTOS);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<AgendamentoDTO> atualizarAgendamento(@PathVariable Integer id, @RequestBody AgendamentoDTO agendamentoDTO) {
+        Agendamento agendamento = agendamentoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Agendamento não encontrado"));
+
+        agendamento.setDescricao(agendamentoDTO.getDescricao());
+        agendamento.setData_agendamento(agendamentoDTO.getData_agendamento());
+
+        agendamentoRepository.save(agendamento);
+
+        AgendamentoDTO respostaDTO = new AgendamentoDTO();
+        respostaDTO.setId_agendamento(agendamento.getId_agendamento());
+        respostaDTO.setCliente_id(agendamento.getUsuario().getId_usuario());
+        respostaDTO.setDescricao(agendamento.getDescricao());
+        respostaDTO.setData_agendamento(agendamento.getData_agendamento());
+        respostaDTO.setNomeUsuario(agendamento.getUsuario().getNome());
+
+        return ResponseEntity.ok(respostaDTO);
     }
 }

@@ -18,7 +18,7 @@ public class CabeleleilaApplication{
     public CommandLineRunner run(@Autowired UsuarioRepository usuarioRepository) {
         return args -> {
             Usuario usuario = new Usuario();
-            usuario.setEmail("hugoseit@icloud.com");
+            usuario.setEmail("hugoseite@icloud.com");
             usuario.setSenha("123");
             usuario.setNome("hugo");
             usuarioRepository.save(usuario);
