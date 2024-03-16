@@ -4,7 +4,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById('form-agendamento').addEventListener('submit', function(e) {
         e.preventDefault(); 
-        validarFormulario();
+        if (validarFormulario()) { 
+            adicionarOuEditarAgendamento();
+        }
     });
 
     document.getElementById("plus").addEventListener("click", function() {
@@ -105,10 +107,10 @@ function validarFormulario() {
 
     if (servico === "" || data === "" || horario === "") {
         alert("Por favor, preencha todos os campos.");
-        return; 
+        return false; 
     }
 
-    adicionarAgendamento(); 
+    return true; 
 }
 
 async function abrirModalEdicao(idAgendamento) {
@@ -129,6 +131,7 @@ async function abrirModalEdicao(idAgendamento) {
 }
 
 function adicionarOuEditarAgendamento() {
+    const form = document.getElementById('form-agendamento');
     const idAgendamento = document.getElementById('form-agendamento').getAttribute('data-id');
     const servico = document.getElementById("servico").value;
     const data = document.getElementById("data").value;
@@ -148,10 +151,15 @@ function adicionarOuEditarAgendamento() {
     let successMessage = "Agendamento adicionado com sucesso!";
 
     if (idAgendamento) {
+        if (!validarDataAgendamento(`${data}T${horario}:00`)) {
+            return; 
+
+        }
         url += `/${idAgendamento}`;
         method = 'put';
         successMessage = "Agendamento atualizado com sucesso!";
     }
+    
 
     axios({
         method: method,
@@ -169,18 +177,23 @@ function adicionarOuEditarAgendamento() {
     });
 
     limparFormularioAgendamento();
-    document.getElementById('form-agendamento').removeAttribute('data-id');
+    form.removeAttribute('data-id'); 
 }
 
-function diferencaEmDias(data1, data2) {
-    const umDia = 24 * 60 * 60 * 1000; 
-    const diferencaTempo = Math.abs(data2 - data1);
-    return Math.round(diferencaTempo / umDia);
+function validarDataAgendamento(dataAgendamento) {
+    const dataAtual = new Date();
+    dataAtual.setHours(0, 0, 0, 0); 
+
+    const dataFormatada = new Date(dataAgendamento.split('T')[0]); 
+
+    const diferencaTempo = dataFormatada.getTime() - dataAtual.getTime();
+    const diferencaDias = diferencaTempo / (1000 * 3600 * 24);
+
+    if (diferencaDias < 2) {
+        alert("Alteração de agendamento permitida apenas até 2 dias antes da data agendada. Por favor, entre em contato por telefone para alterações.");
+        return false;
+    }
+
+    return true;
 }
 
-
-
-document.getElementById('form-agendamento').addEventListener('submit', function(e) {
-    e.preventDefault(); 
-    adicionarOuEditarAgendamento();
-});
