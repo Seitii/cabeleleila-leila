@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById('form-agendamento').addEventListener('submit', function(e) {
         e.preventDefault(); 
-        if (validarFormulario()) { 
+        if (validarFormulario()) {
             adicionarOuEditarAgendamento();
         }
     });
@@ -87,6 +87,7 @@ function adicionarAgendamento() {
             }
 
             limparFormularioAgendamento();
+
             listarTodosAgendamentos();
         })
         .catch(function(error) {
@@ -98,7 +99,8 @@ function adicionarAgendamento() {
 function limparFormularioAgendamento() {
     document.getElementById("servico").value = '';
     document.getElementById("data").value = '';
-    document.getElementById("horario").value = '';   
+    document.getElementById("horario").value = '';
+    
 }
 
 function validarFormulario() {
@@ -110,17 +112,16 @@ function validarFormulario() {
         alert("Por favor, preencha todos os campos.");
         return false;
     }
-
-    if (!validarDataAgendamento(`${data}T${horario}:00`)) {
-        return false; 
+    
+    const isNaMesmaSemana = verificarAgendamentoNaMesmaSemana(data, horario);
+    if (!isNaMesmaSemana) {
+        return false;
     }
 
-    verificarAgendamentoNaMesmaSemana(data, horario);
     return true;
 }
 
 async function abrirModalEdicao(idAgendamento) {
-        console.log("Tentando abrir modal de edição para o agendamento com ID:", idAgendamento);
     try {
         const response = await axios.get(`http://localhost:8080/api/agendamento/${idAgendamento}`);
         const agendamento = response.data;
@@ -165,7 +166,8 @@ function adicionarOuEditarAgendamento() {
         url += `/${idAgendamento}`;
         method = 'put';
         successMessage = "Agendamento atualizado com sucesso!";
-    } 
+    }
+    
 
     axios({
         method: method,
@@ -189,7 +191,9 @@ function adicionarOuEditarAgendamento() {
 function validarDataAgendamento(dataAgendamento) {
     const dataAtual = new Date();
     dataAtual.setHours(0, 0, 0, 0); 
+
     const dataFormatada = new Date(dataAgendamento.split('T')[0]); 
+
     const diferencaTempo = dataFormatada.getTime() - dataAtual.getTime();
     const diferencaDias = diferencaTempo / (1000 * 3600 * 24);
 
@@ -197,24 +201,35 @@ function validarDataAgendamento(dataAgendamento) {
         alert("Alteração de agendamento permitida apenas até 2 dias antes da data agendada. Por favor, entre em contato por telefone para alterações.");
         return false;
     }
+
     return true;
 }
 
-function verificarAgendamentoNaMesmaSemana(data, horario) {
-    const dataFormatada = new Date(`${data}T${horario}:00`);
+function estaNaMesmaSemana(data1, data2) {
+    const startOfWeek = date => new Date(date.setDate(date.getDate() - date.getDay() + (date.getDay() === 0 ? -6 : 1))); // Ajusta para a segunda-feira como o primeiro dia da semana
+    const endOfWeek = date => new Date(date.setDate(date.getDay() === 0 ? date.getDate() : date.getDate() + (7 - date.getDay())));
 
-    for (let i = 0; i < agendamentosGlobal.length; i++) {
-        let agendamento = agendamentosGlobal[i];
-        let dataAgendamentoExistente = new Date(agendamento.data_agendamento);
-        let dataAgendamentoNovo = new Date(dataFormatada);
-        let umaSemanaAposAgendamentoExistente = new Date(dataAgendamentoExistente);
-        umaSemanaAposAgendamentoExistente.setDate(dataAgendamentoExistente.getDate() + 7);
+    let semanaInicio1 = startOfWeek(new Date(data1));
+    let semanaFim1 = endOfWeek(new Date(data1));
 
-        if (umaSemanaAposAgendamentoExistente >= dataAgendamentoNovo) {
-            if (window.confirm(`Já existe um agendamento para esta semana em ${agendamento.data_agendamento}. Deseja agendar para a mesma data?`)) {
-                document.getElementById('form-agendamento').setAttribute('data-id', agendamento.id_agendamento);
-            }
-            break; 
+    return new Date(data2) >= semanaInicio1 && new Date(data2) <= semanaFim1;
+}
+
+function verificarAgendamentoNaMesmaSemana(dataEscolhida, horarioEscolhido) {
+    const dataFormatadaEscolhida = `${dataEscolhida}T${horarioEscolhido}:00`;
+    let agendamentoExistenteNaSemana = agendamentosGlobal.find(agendamento => 
+        estaNaMesmaSemana(new Date(agendamento.data_agendamento), new Date(dataFormatadaEscolhida)));
+
+    if (agendamentoExistenteNaSemana) {
+        const dataAgendamentoExistente = agendamentoExistenteNaSemana.data_agendamento.split('T')[0];
+        if (confirm(`Já existe um agendamento para esta semana em ${dataAgendamentoExistente}. Deseja agendar para a mesma data?`)) {
+            document.getElementById('form-agendamento').setAttribute('data-id', agendamentoExistenteNaSemana.id_agendamento);
+            return true;
+        } else {
+            document.getElementById('form-agendamento').removeAttribute('data-id');
+            return true; 
         }
     }
+    document.getElementById('form-agendamento').removeAttribute('data-id');
+    return true; 
 }
