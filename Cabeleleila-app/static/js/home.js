@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     document.getElementById("plus").addEventListener("click", function() {
-        document.querySelector(".modalDialog").style.display = "block";
+        document.querySelector(".modalDialog").style.display = "block";  // procura o id plus e retorna a mensagem. 
     });
 
     document.getElementById("closeModal").addEventListener("click", function() {
@@ -29,8 +29,17 @@ function preencherNomeUsuario() {
         document.querySelector('.usuario').textContent = nomeUsuario;
     }
 }
-
 var agendamentosGlobal = [];
+
+function formatarData(dataISO) {
+    const data = new Date(dataISO);
+    const dia = data.getDate().toString().padStart(2, '0');
+    const mes = (data.getMonth() + 1).toString().padStart(2, '0'); // esta 0 pq começa em janeiro
+    const ano = data.getFullYear();
+    const horas = data.getHours().toString().padStart(2, '0');
+    const minutos = data.getMinutes().toString().padStart(2, '0');
+    return `${dia}/${mes}/${ano} ${horas}:${minutos}`;
+}
 
 async function listarTodosAgendamentos() {
     try {
@@ -43,10 +52,11 @@ async function listarTodosAgendamentos() {
         agendamentos.forEach(agendamento => {
             const item = document.createElement('div');
             item.classList.add('agendamento-item');
+            const dataFormatada = formatarData(agendamento.data_agendamento);
             item.innerHTML = `
                 <p>Cliente: ${agendamento.nomeUsuario}</p>
                 <p>Serviço: ${agendamento.descricao}</p>
-                <p>Data: ${agendamento.data_agendamento}</p>
+                <p>Data: ${dataFormatada}</p>
                 <button class="edit-btn" data-id="${agendamento.id_agendamento}">Editar</button>
             `;
             listaAgendamentos.appendChild(item);
@@ -127,8 +137,8 @@ async function abrirModalEdicao(idAgendamento) {
         const agendamento = response.data;
 
         document.getElementById('servico').value = agendamento.descricao;
-        document.getElementById('data').value = agendamento.data_agendamento.split('T')[0];
-        document.getElementById('horario').value = agendamento.data_agendamento.split('T')[1].slice(0, 5);
+        document.getElementById('data').value = agendamento.data_agendamento.split('T')[0]; // Pega a data e ignora o horário
+        document.getElementById('horario').value = agendamento.data_agendamento.split('T')[1].slice(0, 5); // Pega o horário e ignora os segundos
         document.getElementById('nome').value = agendamento.nomeUsuario; 
 
         document.getElementById('form-agendamento').setAttribute('data-id', idAgendamento);
@@ -154,20 +164,18 @@ function adicionarOuEditarAgendamento() {
         nomeUsuario: nomeUsuario
     };
 
+    if (!validarDataAgendamento(`${data}T${horario}:00`)) {
+        return;
+    }
+
     let url = 'http://localhost:8080/api/agendamento';
     let method = 'post';
     let successMessage = "Agendamento adicionado com sucesso!";
-
     if (idAgendamento) {
-        if (!validarDataAgendamento(`${data}T${horario}:00`)) {
-            return; 
-
-        }
         url += `/${idAgendamento}`;
         method = 'put';
         successMessage = "Agendamento atualizado com sucesso!";
     }
-    
 
     axios({
         method: method,
@@ -176,8 +184,8 @@ function adicionarOuEditarAgendamento() {
     })
     .then(function(response) {
         alert(successMessage);
-        document.querySelector(".modalDialog").style.display = "none"; 
-        listarTodosAgendamentos(); 
+        document.querySelector(".modalDialog").style.display = "none";
+        listarTodosAgendamentos();
     })
     .catch(function(error) {
         console.error(error);
@@ -185,51 +193,45 @@ function adicionarOuEditarAgendamento() {
     });
 
     limparFormularioAgendamento();
-    form.removeAttribute('data-id'); 
+    form.removeAttribute('data-id');
 }
 
 function validarDataAgendamento(dataAgendamento) {
-    const dataAtual = new Date();
-    dataAtual.setHours(0, 0, 0, 0); 
+    const dataNovoAgendamento = new Date(dataAgendamento.split('T')[0]);
 
-    const dataFormatada = new Date(dataAgendamento.split('T')[0]); 
+    for (let agendamento of agendamentosGlobal) {
+        const dataAgendamentoExistente = new Date(agendamento.data_agendamento.split('T')[0]);
+        
+        const diferencaTempo = dataAgendamentoExistente - dataNovoAgendamento;
+        const diferencaDias = diferencaTempo / (1000 * 3600 * 24);
 
-    const diferencaTempo = dataFormatada.getTime() - dataAtual.getTime();
-    const diferencaDias = diferencaTempo / (1000 * 3600 * 24);
-
-    if (diferencaDias < 2) {
-        alert("Alteração de agendamento permitida apenas até 2 dias antes da data agendada. Por favor, entre em contato por telefone para alterações.");
-        return false;
+        if (diferencaDias >= 0 && diferencaDias < 2) {
+            alert("Já existe um agendamento dentro de 2 dias da data selecionada. Escolha outra data.");
+            return false;
+        }
     }
 
-    return true;
-}
-
-function estaNaMesmaSemana(data1, data2) {
-    const startOfWeek = date => new Date(date.setDate(date.getDate() - date.getDay() + (date.getDay() === 0 ? -6 : 1))); // Ajusta para a segunda-feira como o primeiro dia da semana
-    const endOfWeek = date => new Date(date.setDate(date.getDay() === 0 ? date.getDate() : date.getDate() + (7 - date.getDay())));
-
-    let semanaInicio1 = startOfWeek(new Date(data1));
-    let semanaFim1 = endOfWeek(new Date(data1));
-
-    return new Date(data2) >= semanaInicio1 && new Date(data2) <= semanaFim1;
+    return true; 
 }
 
 function verificarAgendamentoNaMesmaSemana(dataEscolhida, horarioEscolhido) {
-    const dataFormatadaEscolhida = `${dataEscolhida}T${horarioEscolhido}:00`;
-    let agendamentoExistenteNaSemana = agendamentosGlobal.find(agendamento => 
-        estaNaMesmaSemana(new Date(agendamento.data_agendamento), new Date(dataFormatadaEscolhida)));
+    const dataFormatadaEscolhida = new Date(`${dataEscolhida}T${horarioEscolhido}:00`);
+    let agendamentoExistenteProximo = agendamentosGlobal.find(agendamento => {
+        let dataAgendamentoExistente = new Date(agendamento.data_agendamento);
+        let diferencaDias = (dataFormatadaEscolhida - dataAgendamentoExistente) / (1000 * 3600 * 24);
+        
+        return diferencaDias >= 0 && diferencaDias <= 7;
+    });
 
-    if (agendamentoExistenteNaSemana) {
-        const dataAgendamentoExistente = agendamentoExistenteNaSemana.data_agendamento.split('T')[0];
-        if (confirm(`Já existe um agendamento para esta semana em ${dataAgendamentoExistente}. Deseja agendar para a mesma data?`)) {
-            document.getElementById('form-agendamento').setAttribute('data-id', agendamentoExistenteNaSemana.id_agendamento);
-            return true;
+    if (agendamentoExistenteProximo) {
+        const dataAgendamentoExistente = agendamentoExistenteProximo.data_agendamento.split('T')[0];
+        if (confirm(`Já existe um agendamento próximo a esta data em ${dataAgendamentoExistente}. Deseja agendar mesmo assim?`)) {
+            document.getElementById('form-agendamento').setAttribute('data-id', agendamentoExistenteProximo.id_agendamento);
         } else {
             document.getElementById('form-agendamento').removeAttribute('data-id');
-            return true; 
         }
+        return true;
     }
     document.getElementById('form-agendamento').removeAttribute('data-id');
-    return true; 
+    return true;
 }
